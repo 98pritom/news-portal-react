@@ -1,10 +1,10 @@
 import { FaEye, FaShareAlt } from "react-icons/fa";
 import { AiFillStar } from "react-icons/ai";
 import { MdOutlineBookmarkBorder } from "react-icons/md";
+import { Link } from "react-router-dom";
 
 const NewsCard = ({ news }) => {
     const { title,
-        image_url,
         thumbnail_url,
         details,
         total_view,
@@ -32,17 +32,24 @@ const NewsCard = ({ news }) => {
                 </div>
             </div>
 
+            <div className="w-full h-96 bg-gray-100 flex justify-center items-center">
+                <img
+                    src={thumbnail_url}
+                    alt="thumbnail"
+                    className="h-full object-contain"
+                />
+            </div>
+
+
             <div className="card-body p-4">
                 <h2 className="card-title text-base font-semibold">
                     {title}
                 </h2>
-                <figure className="py-3">
-                    <img src={thumbnail_url || image_url} alt="news" className="w-full object-cover rounded-lg" />
-                </figure>
+
                 <p className="text-sm text-gray-700">
                     {details.length > 150 ? (
                         <>
-                            {details.slice(0, 150)}... <span className="text-blue-600 cursor-pointer">Read More</span>
+                            {details.slice(0, 150)}... <Link to={`/news/${news._id}`} className="text-blue-600 cursor-pointer">Read More</Link>
                         </>
                     ) : (
                         details
