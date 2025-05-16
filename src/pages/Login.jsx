@@ -1,10 +1,14 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../providers/AuthProvider';
 
 const Login = () => {
 
-    const { loginUser } = useContext(AuthContext);
+    const [error, setError] = useState({});
+    const { loginUser, setUser } = useContext(AuthContext);
+    const navigate = useNavigate();
+    const location = useLocation();
+    console.log(location.state);
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -17,11 +21,13 @@ const Login = () => {
         loginUser(email, password)
             .then(result => {
                 const loadedUser = result.user;
-                console.log(loadedUser);
+                navigate(location?.state ? location.state : '/');
+                setUser(loadedUser);
             })
-            .catch(error => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
+            .catch(err => {
+                const errorCode = err.code;
+                const errorMessage = err.message;
+                setError({ ...error, login: err.code });
                 console.log(errorCode, errorMessage);
             })
 
@@ -36,6 +42,9 @@ const Login = () => {
                         <input name='email' type="email" className="input w-full" placeholder="Email" />
                         <label className="label">Password</label>
                         <input name='password' type="password" className="input w-full" placeholder="Password" />
+                        {
+                            error.login && <p className='text-sm text-red-600'>{error.login}</p>
+                        }
                         <div><a className="link link-hover">Forgot password?</a></div>
                         <button className="btn btn-neutral mt-4 w-full">Login</button>
                     </form>

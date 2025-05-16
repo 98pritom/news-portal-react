@@ -1,15 +1,21 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../providers/AuthProvider';
 
 const Register = () => {
 
-    const { createNewUser, setUser } = useContext(AuthContext);
+    const { createNewUser, setUser, updateUserProfile } = useContext(AuthContext);
+    const [error, setError] = useState({});
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const form = new FormData(e.target);
         const name = form.get('name');
+        if (name.length < 3) {
+            setError({ ...error, name: 'Name must be at least 3 characters long.' });
+            return;
+        }
         const image = form.get('image');
         const email = form.get('email');
         const password = form.get('password');
@@ -19,7 +25,14 @@ const Register = () => {
             .then((result) => {
                 const user = result.user;
                 setUser(user);
-                console.log(user);
+                updateUserProfile({ displayName: name, photoURL: image })
+                    .then(() => {
+                        navigate('/')
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code;
+                        console.log(errorCode);
+                    })
             })
             .catch((error) => {
                 const errorCode = error.code;
@@ -36,6 +49,9 @@ const Register = () => {
                     <form onSubmit={handleSubmit} className="form">
                         <label className="label">Name</label>
                         <input name='name' type="text" className="input w-full" placeholder="Name" />
+                        {
+                            error.name && <p className='text-xs text-red-600'>{error.name}</p>
+                        }
                         <label className="label">Image</label>
                         <input name='image' type="text" className="input w-full" placeholder="Image URL" />
                         <label className="label">Email</label>
